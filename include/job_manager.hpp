@@ -1,3 +1,4 @@
+#pragma once
 #include "job.hpp"
 #include <queue>
 #include <optional>

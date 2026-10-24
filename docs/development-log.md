@@ -93,3 +93,17 @@ Basic file I/O, operation-result handling, and unknown-job handling were impleme
  - Also history is retrived from the hash_map and displayed.
 
  **GitHub Status** Pushed
+
+ ### Session 4 - Code CleanUp
+
+ **Objective**
+  - The goal is to make the code looks clean.
+
+**Implementation**
+  - Implemented new header files `job_display.hpp`, `job_executions.hpp`, `job_operations.hpp`.
+  - Implemented new source files `job_display.cpp`, `job_executions.cpp`, `job_operations.cpp`.
+  - Cleaned up `main.cpp` file.
+
+**Outcome**
+  - Code cleaned up as expected.
+  
