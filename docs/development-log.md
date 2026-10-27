@@ -108,3 +108,37 @@ Basic file I/O, operation-result handling, and unknown-job handling were impleme
   - Code cleaned up as expected.
 
 **GitHub Status** Pushed
+
+### Session 5 - Improving Job Status Validation and Execution Consistency
+
+**Objectives**
+
+- The previous implementation updated job statuses without checking whether the job ID existed in the registry.
+- There was a need to validate status updates and prevent execution when a job could not be found.
+- Ensure `JobManager` remains the single source of truth for the latest job status.
+- Keep generated files such as `job_report.txt` out of the GitHub repository.
+
+**Implementation**
+
+- Changed `updateJobStatus(unsigned long int job_id, JobStatus status)` in `job_manager.hpp` from `void` to `bool`.
+- The function now returns `true` when the job ID exists in the `jobs` hash map and its status is updated; otherwise, it returns `false`.
+- Updated `CalculateSum_Execution()` to check the result of `manager.updateJobStatus(result.Job_Id, JobStatus::InProcess)`. If the update fails, the function returns immediately without executing the calculation.
+- Applied the same initial status validation pattern to `Recreate_Execution()` and `Unknown_Execution()`.
+- In `CalculateSum_Execution()`, the job status is updated to `Completed` after the calculation.
+- In `Recreate_Execution()`, the job status is updated to `Completed` if the report-writing operation succeeds, or `Failed` if it fails.
+- In `Unknown_Execution()`, the job is marked `Failed` only after the initial status update succeeds.
+- Used `manager.getJobById(result.Job_Id)` and `has_value()` to retrieve and display the latest job record from the registry.
+- Tested the updated implementation by building and running the project.
+- Updated `.gitignore` to ignore `/job_report.txt`, preventing the generated report from appearing as an untracked file.
+
+**Outcome**
+
+- The project compiled successfully using CMake.
+- `CalculateSum` executed successfully and returned `400`, with its final status displayed as `Completed`.
+- `Recreate` successfully generated the report, and its final status was displayed as `Completed`.
+- `UnknowTask` was identified as an unknown job and its status was displayed as `Failed`.
+- The scheduler processed all three jobs and displayed `No Jobs Available` after the queue was exhausted.
+- Job status validation is now more consistent across the execution functions.
+- The registry continues to store the latest job status rather than a complete history of status transitions.
+
+**GitHub Status:** Pushed
