@@ -38,12 +38,14 @@ public:
         }
     }
 
-    void updateJobStatus(unsigned long int job_id, JobStatus status)
+    bool updateJobStatus(unsigned long int job_id, JobStatus status)
     {
         if (jobs.find(job_id) != jobs.end())
         {
             jobs[job_id].Status = status;
+            return true;
         }
+        return false;
     }
 
     std::optional<Job> getJobById(unsigned long int job_id)

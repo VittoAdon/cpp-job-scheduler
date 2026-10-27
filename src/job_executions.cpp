@@ -6,13 +6,13 @@
 
 void CalculateSum_Execution(Job &result, JobManager &manager)
 {
-    result.Status = JobStatus::InProcess;
-    manager.updateJobStatus(result.Job_Id, result.Status);
+    if (!manager.updateJobStatus(result.Job_Id, JobStatus::InProcess))
+    {
+        return;
+    }
     int answer = CalculateSum(125, 275);
-    result.Status = JobStatus::Completed;
-    manager.updateJobStatus(result.Job_Id, result.Status);
+    manager.updateJobStatus(result.Job_Id, JobStatus::Completed);
     std::cout << answer << "\n";
-    JobDetails(result);
     auto history_result = manager.getJobById(result.Job_Id);
     if (history_result.has_value())
     {
@@ -23,20 +23,19 @@ void CalculateSum_Execution(Job &result, JobManager &manager)
 
 void Recreate_Execution(Job &result, JobManager &manager)
 {
-    result.Status = JobStatus::InProcess;
-    manager.updateJobStatus(result.Job_Id, result.Status);
+    if (!manager.updateJobStatus(result.Job_Id, JobStatus::InProcess))
+    {
+        return;
+    }
     bool isTrue = Recreate();
     if (isTrue)
     {
-        result.Status = JobStatus::Completed;
-        manager.updateJobStatus(result.Job_Id, result.Status);
+        manager.updateJobStatus(result.Job_Id, JobStatus::Completed);
     }
     else
     {
-        result.Status = JobStatus::Failed;
-        manager.updateJobStatus(result.Job_Id, result.Status);
+        manager.updateJobStatus(result.Job_Id, JobStatus::Failed);
     }
-    JobDetails(result);
     auto history_result = manager.getJobById(result.Job_Id);
     if (history_result.has_value())
     {
@@ -47,10 +46,11 @@ void Recreate_Execution(Job &result, JobManager &manager)
 
 void Unknown_Execution(Job &result, JobManager &manager)
 {
+    if (!manager.updateJobStatus(result.Job_Id, JobStatus::Failed))
+    {
+        return;
+    }
     std::cout << "Unknown Job!\n";
-    result.Status = JobStatus::Failed;
-    manager.updateJobStatus(result.Job_Id, result.Status);
-    JobDetails(result);
     auto history_result = manager.getJobById(result.Job_Id);
     if (history_result.has_value())
     {
