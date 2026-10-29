@@ -8,6 +8,7 @@ add_executable(
     src/job_operations.cpp 
     src/job_executions.cpp
     src/job_display.cpp
+    src/execute_work.cpp
 )
 
 target_include_directories(job_run PRIVATE include)
