@@ -2,7 +2,7 @@
 #include "job.hpp"
 #include "job_display.hpp"
 
-void JobStatus_Indicator(JobStatus &a)
+void JobStatus_Indicator(const JobStatus &a)
 {
     switch (a)
     {
@@ -21,7 +21,7 @@ void JobStatus_Indicator(JobStatus &a)
     }
 }
 
-void JobDetails(Job &a)
+void JobDetails(const Job &a)
 {
     std::cout << a.Job_Id << "\n";
     std::cout << a.Job_Name << "\n";

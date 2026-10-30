@@ -142,3 +142,167 @@ Basic file I/O, operation-result handling, and unknown-job handling were impleme
 - The registry continues to store the latest job status rather than a complete history of status transitions.
 
 **GitHub Status:** Pushed
+
+### Session 6 - Refactoring Job Dispatch into a Separate Component
+
+**Objectives**
+
+- The previous implementation had queue processing and job-name comparisons directly inside `main.cpp`.
+- As the number of job types grows, keeping all dispatch logic in `main.cpp` would make the code harder to maintain and debug.
+- Keep `main.cpp` focused on connecting components and coordinating the application.
+- Introduce a separate component to handle queue processing and dispatch jobs to their respective execution functions.
+
+**Implementation**
+
+- Created `include/execute_work.hpp` to declare the `execute_work()` function.
+- Declared the function as `void execute_work(JobManager &manager);`, passing `JobManager` by reference to access the existing queue and registry without creating a copy.
+- Created `src/execute_work.cpp` to implement the queue-processing and dispatch logic.
+- Moved the `while` loop from `main.cpp` into `execute_work()`.
+- Used `manager.getNextJob()` to retrieve jobs from the FIFO queue.
+- Used `has_value()` to check whether a job was retrieved. If the queue was empty, the function displayed `No Jobs Available` and terminated the loop.
+- Moved the existing job-name comparisons into `execute_work.cpp`:
+  - `CalculateSum` calls `CalculateSum_Execution()`.
+  - `Recreate` calls `Recreate_Execution()`.
+  - Unrecognized job names call `Unknown_Execution()`.
+- Updated `main.cpp` to create the jobs and call `execute_work(manager)` instead of processing the queue directly.
+- Updated `CMakeLists.txt` to include `src/execute_work.cpp` in the executable build.
+- Initially encountered a linker error, `undefined reference to execute_work(JobManager&)`, because the new source file was not included in the build configuration. Added the source file to CMake and rebuilt successfully.
+
+**Outcome**
+
+- The project compiled successfully using CMake.
+- All three jobs executed with their expected results:
+  - `CalculateSum` returned `400` and finished with status `Completed`.
+  - `Recreate` successfully generated the report and finished with status `Completed`.
+  - `UnknowTask` was identified as an unknown job and finished with status `Failed`.
+- The queue was processed until empty, displaying `No Jobs Available`.
+- Job dispatch and queue processing were separated from `main.cpp`, improving code organization and making future maintenance easier.
+- The dispatch mechanism still uses an `if/else` chain. Improving dispatch scalability remains a future task.
+- Identified the next development milestone: create an interactive CLI so users can submit jobs dynamically instead of relying on hardcoded jobs.
+
+**GitHub Status:** Pushed
+
+# Session 7 – Building an Interactive CLI for the C++ Job Scheduler
+
+## 1. Objective
+
+Transform the existing hardcoded Job Scheduler into an interactive command-line application (CLI), allowing users to submit, process, view, and search jobs through a menu-driven interface.
+
+## 2. Implementation
+
+### A. Interactive CLI Menu
+
+Implemented a menu-driven interface using:
+- `do-while` loop to keep the application running.
+- `switch-case` to handle user selections.
+- `std::cin` and `std::cout` for user interaction.
+- `JobManager` instance maintained outside the loop to preserve application state.
+
+Available operations:
+
+1. Submit a job
+2. Process queue
+3. View all jobs
+4. Find job by ID
+5. Exit
+
+### B. Job Submission
+
+Implemented interactive job selection.
+
+Supported job types:
+- CalculateSum
+- Recreate
+
+Used the existing `JobManager::createJob()` function to create jobs and add them to the processing queue and job registry.
+
+Added submission confirmation messages and invalid job selection handling.
+
+### C. Queue Processing
+
+Integrated the existing `execute_work()` function into the CLI.
+
+- Reused the Session 6 job dispatch implementation.
+- Processed pending jobs through the existing execution functions.
+- Handled empty queue conditions.
+- Allowed users to submit and process additional jobs without restarting the application.
+
+### D. View All Jobs
+
+Implemented `getAllJob()` in `JobManager`.
+
+Key concepts applied:
+- `std::vector<Job>` to store a temporary collection of job copies.
+- `std::unordered_map` iteration using a range-based for loop.
+- `const auto&` to avoid unnecessary copies during iteration.
+- `empty()` to check whether jobs are available.
+- Reused `JobDetails()` to display job information.
+
+Important design decision:
+
+The unordered map remains the source of truth for job records. The vector contains temporary copies for displaying jobs and does not modify the original registry or processing queue.
+
+### E. Find Job by ID
+
+Integrated the existing `getJobById()` function.
+
+Implemented:
+- User input for Job ID.
+- Job lookup through the registry.
+- `std::optional<Job>` to represent a potentially missing job.
+- `has_value()` to check whether a job exists.
+- Dereferencing the optional to display the retrieved job.
+- Error handling for nonexistent job IDs.
+
+### F. Const Correctness
+
+Updated the display function interfaces to support read-only access:
+
+- `JobDetails(const Job &a)`
+- `JobStatus_Indicator(const JobStatus &a)`
+
+This prevents accidental modification of job information during display operations.
+
+### G. C++ Header and Source File Concepts
+
+Discussed the difference between declarations and definitions.
+
+- `.hpp`: Interfaces, class declarations, member variables, and function declarations.
+- `.cpp`: Actual function implementations.
+
+Discussed why `JobManager` currently has implementations inside its header and why separating them into a source file will improve maintainability as the project grows.
+
+## 3. Testing and Verification
+
+Successfully tested the following scenarios:
+
+| Test | Result |
+|---|---|
+| Submit CalculateSum | Successful |
+| Submit Recreate | Successful |
+| View all pending jobs | Successful |
+| Find existing job by ID | Successful |
+| Process multiple jobs | Successful |
+| Verify completed statuses | Successful |
+| Process an empty queue | Handled |
+| View jobs after processing | Successful |
+| Search for nonexistent ID | Handled |
+| Submit additional jobs after processing | Supported |
+| Exit application | Successful |
+
+
+## 4. Session Outcome
+
+Successfully transformed the previous hardcoded Job Scheduler into an interactive CLI application.
+
+The application can now:
+- Submit different job types.
+- Maintain a processing queue.
+- Execute pending jobs.
+- Track job statuses.
+- Display all registered jobs.
+- Search for individual jobs by ID.
+- Continue operating after queue processing.
+
+**GitHub Status:** Pushed
+

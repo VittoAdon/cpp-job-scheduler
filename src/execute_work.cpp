@@ -10,7 +10,8 @@ void execute_work(JobManager &manager)
 
         if (!result.has_value())
         {
-            std::cout << "No Jobs Available";
+            std::cout << "No Jobs Available\n";
+            std::cout << "\n";
             break;
         }
         if (result->Job_Name == "CalculateSum")

@@ -4,6 +4,7 @@
 #include <optional>
 #include <unordered_map>
 #include <string>
+#include <vector>
 
 class JobManager
 {
@@ -59,5 +60,15 @@ public:
         {
             return std::nullopt;
         }
+    }
+
+    std::vector<Job> getAllJob() const
+    {
+        std::vector<Job> viewJobs;
+        for (const auto &pair : jobs)
+        {
+            viewJobs.push_back(pair.second);
+        }
+        return viewJobs;
     }
 };
