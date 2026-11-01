@@ -190,7 +190,7 @@ Transform the existing hardcoded Job Scheduler into an interactive command-line 
 
 ## 2. Implementation
 
-### A. Interactive CLI Menu
+### 2.1. Interactive CLI Menu
 
 Implemented a menu-driven interface using:
 - `do-while` loop to keep the application running.
@@ -206,7 +206,7 @@ Available operations:
 4. Find job by ID
 5. Exit
 
-### B. Job Submission
+### 2.2. Job Submission
 
 Implemented interactive job selection.
 
@@ -218,7 +218,7 @@ Used the existing `JobManager::createJob()` function to create jobs and add them
 
 Added submission confirmation messages and invalid job selection handling.
 
-### C. Queue Processing
+### 2.3. Queue Processing
 
 Integrated the existing `execute_work()` function into the CLI.
 
@@ -227,7 +227,7 @@ Integrated the existing `execute_work()` function into the CLI.
 - Handled empty queue conditions.
 - Allowed users to submit and process additional jobs without restarting the application.
 
-### D. View All Jobs
+### 2.4. View All Jobs
 
 Implemented `getAllJob()` in `JobManager`.
 
@@ -242,7 +242,7 @@ Important design decision:
 
 The unordered map remains the source of truth for job records. The vector contains temporary copies for displaying jobs and does not modify the original registry or processing queue.
 
-### E. Find Job by ID
+### 2.5. Find Job by ID
 
 Integrated the existing `getJobById()` function.
 
@@ -254,7 +254,7 @@ Implemented:
 - Dereferencing the optional to display the retrieved job.
 - Error handling for nonexistent job IDs.
 
-### F. Const Correctness
+### 2.6. Const Correctness
 
 Updated the display function interfaces to support read-only access:
 
@@ -263,7 +263,7 @@ Updated the display function interfaces to support read-only access:
 
 This prevents accidental modification of job information during display operations.
 
-### G. C++ Header and Source File Concepts
+### 2.7. C++ Header and Source File Concepts
 
 Discussed the difference between declarations and definitions.
 
@@ -303,6 +303,92 @@ The application can now:
 - Display all registered jobs.
 - Search for individual jobs by ID.
 - Continue operating after queue processing.
+
+**GitHub Status:** Pushed
+
+# C++ Job Scheduler — Session 8
+
+## 1. Objectives
+
+- Implement robust input validation across the interactive CLI.
+- Handle invalid, partially numeric and out-of-range user inputs.
+- Understand and implement C++ exception handling using `try`, `catch` and `throw`.
+- Prevent invalid inputs from interrupting application execution or causing unintended termination.
+- Improve variable scope, code structure and readability.
+- Verify that existing job management and execution functionality remains stable.
+
+## 2. Implementation
+
+### 2.1 Input Validation
+
+Implemented input validation for all three user input paths:
+
+- Main menu selection using `std::stoi()`.
+- Job selection using `std::stoi()`.
+- Job ID lookup using `std::stoul()`.
+
+Used `std::getline()` to read complete input lines and the position parameter of conversion functions to identify partially numeric inputs.
+
+For example, inputs such as `5abc` and `1abc` are rejected instead of being accepted as valid numbers.
+
+### 2.2 Exception Handling — Try, Catch and Throw
+
+Implemented C++ exception handling to manage invalid user inputs safely.
+
+**`try` block**
+- Encloses numeric conversion and input validation operations.
+- Allows exceptions generated during conversion or explicitly thrown during validation to be handled.
+
+**`throw` statement**
+- Used `throw std::invalid_argument()` when the conversion function successfully parsed a numeric prefix but additional characters remained.
+- This ensures partially numeric inputs are rejected.
+
+**`catch` blocks**
+- `std::invalid_argument`: Handles inputs that cannot be converted into valid numbers or fail the complete-input validation check.
+- `std::out_of_range`: Handles numeric values exceeding the supported range.
+
+Replaced generic exception messages with meaningful messages to improve CLI usability.
+
+### 2.3 Control-Flow Correction
+
+Identified and corrected an issue where entering `5abc` could unintentionally terminate the application.
+
+Although `std::stoi()` initially converts the input to `5`, the subsequent position check detects invalid trailing characters and throws an exception.
+
+Resetting the menu choice to `0` inside the main menu exception handlers ensures that invalid input cannot satisfy the exit condition.
+
+### 2.4 Code Cleanup
+
+- Moved variables closer to their respective usage scopes.
+- Removed unnecessary variable declarations.
+- Removed unnecessary `else` blocks following `throw` statements.
+- Improved exception messages.
+- Improved code formatting and readability.
+
+## 3. Testing and Verification
+
+Successfully tested the following scenarios:
+
+- Submitted `CalculateSum` and `Recreate` jobs.
+- Rejected alphabetic and partially numeric menu inputs.
+- Rejected invalid job selections.
+- Verified job lookup using valid and invalid IDs.
+- Tested empty and out-of-range numeric inputs.
+- Verified invalid exit input such as `5abc` does not terminate the application.
+- Processed queued jobs successfully.
+- Verified job statuses changed from `Pending` to `Completed`.
+- Confirmed updated job information remained available after execution.
+- Verified normal application termination using menu option `5`.
+
+## 4. Outcomes
+
+- Implemented robust basic input validation across the interactive CLI.
+- Gained practical experience with `std::stoi()`, `std::stoul()` and their position parameters.
+- Applied C++ exception handling using `try`, `catch` and `throw`.
+- Understood the difference between `std::invalid_argument` and `std::out_of_range`.
+- Improved control-flow reliability by handling invalid inputs without unintended application termination.
+- Improved variable scope and overall code readability.
+- Verified that job submission, lookup, queue processing and status management continue to function correctly.
 
 **GitHub Status:** Pushed
 
