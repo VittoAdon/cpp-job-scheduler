@@ -14,61 +14,13 @@ private:
     std::unordered_map<unsigned long int, Job> jobs;
 
 public:
-    Job createJob(const std::string s)
-    {
-        Job j;
-        j.Job_Id = Id_tracker;
-        j.Job_Name = s;
-        q.push(j);
-        jobs[j.Job_Id] = j;
-        Id_tracker++;
-        return j;
-    }
+    Job createJob(const JobType Type);
 
-    std::optional<Job> getNextJob()
-    {
-        if (q.empty())
-        {
-            return std::nullopt;
-        }
-        else
-        {
-            auto a = q.front();
-            q.pop();
-            return a;
-        }
-    }
+    std::optional<Job> getNextJob();
 
-    bool updateJobStatus(unsigned long int job_id, JobStatus status)
-    {
-        if (jobs.find(job_id) != jobs.end())
-        {
-            jobs[job_id].Status = status;
-            return true;
-        }
-        return false;
-    }
+    bool updateJobStatus(unsigned long int job_id, JobStatus status);
 
-    std::optional<Job> getJobById(unsigned long int job_id)
-    {
-        if (jobs.find(job_id) != jobs.end())
-        {
-            Job result = jobs[job_id];
-            return result;
-        }
-        else
-        {
-            return std::nullopt;
-        }
-    }
+    std::optional<Job> getJobById(unsigned long int job_id);
 
-    std::vector<Job> getAllJob() const
-    {
-        std::vector<Job> viewJobs;
-        for (const auto &pair : jobs)
-        {
-            viewJobs.push_back(pair.second);
-        }
-        return viewJobs;
-    }
+    std::vector<Job> getAllJob() const;
 };

@@ -1,5 +1,4 @@
 #include <iostream>
-#include "job.hpp"
 #include "job_display.hpp"
 
 void JobStatus_Indicator(const JobStatus &a)
@@ -21,10 +20,28 @@ void JobStatus_Indicator(const JobStatus &a)
     }
 }
 
+void JobType_Indicator(const JobType &Type)
+{
+    switch (Type)
+    {
+    case JobType::CalculateSum:
+        std::cout << "CalculateSum";
+        break;
+    case JobType::RecreateFile:
+        std::cout << "RecreateFile";
+        break;
+
+    default:
+        std::cout << "Unknown Job Type";
+        break;
+    }
+}
+
 void JobDetails(const Job &a)
 {
     std::cout << a.Job_Id << "\n";
-    std::cout << a.Job_Name << "\n";
+    JobType_Indicator(a.Type);
+    std::cout << "\n";
     JobStatus_Indicator(a.Status);
     std::cout << "\n";
 }

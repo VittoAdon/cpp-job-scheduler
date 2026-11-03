@@ -14,11 +14,11 @@ void execute_work(JobManager &manager)
             std::cout << "\n";
             break;
         }
-        if (result->Job_Name == "CalculateSum")
+        if (result->Type == JobType::CalculateSum)
         {
             CalculateSum_Execution(*result, manager);
         }
-        else if (result->Job_Name == "Recreate")
+        else if (result->Type == JobType::RecreateFile)
         {
             Recreate_Execution(*result, manager);
         }

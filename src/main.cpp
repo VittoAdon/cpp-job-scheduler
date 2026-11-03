@@ -61,12 +61,12 @@ int main()
 
                     if (choice_1 == 1)
                     {
-                        manager.createJob("CalculateSum");
+                        manager.createJob(JobType::CalculateSum);
                         std::cout << "CalculateSum Job Submitted Successfull! \n";
                     }
                     else if (choice_1 == 2)
                     {
-                        manager.createJob("Recreate");
+                        manager.createJob(JobType::RecreateFile);
                         std::cout << "Recreate Job Submitted Successfull! \n";
                     }
                     else
